@@ -37,18 +37,26 @@ Load libraries necessary for this analysis.
 library(readr)
 library(tidyr)
 library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(class)
+library(caret)
+library(randomForest)
 ```
 
 Read in the data as a tibble and display a few rows.
 
 ```{r read csv}
 heart_tb <- as_tibble(read_csv("heart.csv", show_col_types = FALSE))
+
+#display a few rows of the data
 head(heart_tb)
 ```
 
 1.  Quickly understand your data. Check on missingness and summarize the data, especially with respect to the relationships of the variables to HeartDisease.
 
-```{r summary}
+```{r EDA summary 1}
 #Determine if there is any missing data in any column
 colSums(is.na(heart_tb))
 #View a basic data validation summary table
@@ -58,25 +66,182 @@ psych::describe(heart_tb)
 heart_tb |>
   filter(Cholesterol == 0 | RestingBP == 0)
 ```
--   There is are not any entries with NA, but note there are observations with a RestingBP or Cholesterol equal to 0, which is most likely an error in the data.
 
-2.  Create a new variable that is a factor version of the HeartDisease variable (if needed, this depends on how you read in your data). Remove the ST_Slope variable and the original HeartDisease variable (if applicable).
+-   There are not any entries with NA, but note there are observations with a RestingBP or Cholesterol equal to 0, which is most likely an error in the data. These entries will be replaced with NA, then imputed with mean values. This way the 0 values do not impact the mean.
 
-3.  We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors (although we could try to create our own loss function as an alternative). In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina ChestPainType, and RestingECG.
+2.  Create a new variable that is a factor version of the HeartDisease variable. Remove the ST_Slope variable variable.
+
+```{r}
+#create factor variables
+heart_tb$HeartDisease = as.factor(heart_tb$HeartDisease)
+heart_tb$Sex = as.factor(heart_tb$Sex)
+heart_tb$ExerciseAngina = as.factor(heart_tb$ExerciseAngina)
+heart_tb$ChestPainType = as.factor(heart_tb$ChestPainType)
+heart_tb$RestingECG = as.factor(heart_tb$RestingECG)
+heart_tb$FastingBS = as.character(heart_tb$FastingBS)
+
+#remove column
+heart_tb = select(heart_tb,-ST_Slope)
+
+#Replace 0 values in cholesterol and restingBP to NA, to then impute values with mean of the respective column
+heart_tb[,c('Cholesterol', 'RestingBP')][heart_tb[,c('Cholesterol', 'RestingBP')] == 0] <- NA
+heart_tb <- heart_tb |>
+  replace_na(list(Cholesterol = mean(heart_tb$Cholesterol, na.rm = TRUE),
+                  RestingBP = mean(heart_tb$RestingBP, na.rm = TRUE)))
+#View a basic data validation summary table. Note the changes to Cholesterol and RestingBP
+psych::describe(heart_tb)
+
+#display a few rows of the data
+head(heart_tb)
+
+```
+
+```{r EDA summary 2}
+#Numerical Data
+heart_tb |>
+  select(where(is.numeric), -HeartDisease) |>
+    pivot_longer(cols = everything(), names_to = "var", values_to = "value") |>
+    ggplot(aes(x = value, fill = var)) +
+    facet_wrap(~ var, scales = "free") + #create a plot for each variable in a grid
+    geom_density() +
+    ggtitle("Distribution Plots for Numeric Variables") +
+    guides(fill = "none") + #remove legend
+    theme_light()
+
+#Find correlated variables
+heart_tb |>
+  select(where(is.numeric)) |>
+  ggcorr(label = TRUE)
+
+#Review categorical variables
+g1 <- heart_tb |> 
+  select(HeartDisease, Sex, ChestPainType) |>
+  group_by(HeartDisease, Sex, ChestPainType) |>
+  summarize(count = n(), .groups = 'drop')
+
+ggplot(data = g1, aes(x = Sex, y =count, fill = HeartDisease)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ ChestPainType) +
+  ggtitle("Heart disease by sex and type of chest pain") +
+  theme_light()
+
+g2 <- heart_tb |> 
+  select(HeartDisease, Sex, RestingECG) |>
+  group_by(HeartDisease, Sex, RestingECG) |>
+  summarize(count = n(), .groups = 'drop')
+
+ggplot(data = g2, aes(x = Sex, y =count, fill = HeartDisease)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ RestingECG) +
+  ggtitle("Heart disease by sex and resting ECG") +
+  theme_light()
+
+g3 <- heart_tb |> 
+  select(HeartDisease, ChestPainType, RestingECG) |>
+  group_by(HeartDisease, ChestPainType, RestingECG) |>
+  summarize(count = n(), .groups = 'drop')
+
+ggplot(data = g3, aes(x = RestingECG, y =count, fill = HeartDisease)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ ChestPainType) +
+  ggtitle("Heart disease by resting ECG and type of chest pain") +
+  theme_light()
+
+```
+
+3.  We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors. In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina, ChestPainType, and RestingECG.
+
+```{r dummy var}
+dummies <- dummyVars(HeartDisease ~ ., data = heart_tb)
+heart_tb2 <- head(predict(dummies, newdata = heart_tb))
+```
 
 ## Split Data
 
-Split your data into a training and test set.
+Split your data into a training and test set with 70:30 ratio.
+
+```{r split test/train}
+set.seed(10)
+heartIndex <- createDataPartition(heart_tb$HeartDisease, p = 0.7, list = FALSE)
+head(heartIndex)
+#Training set receives 70% of data
+heartTrain <- heart_tb[heartIndex, ]
+#Testing set receives 30% of data
+heartTest <- heart_tb[-heartIndex, ]
+```
+
+```{r}
+#standardize all numeric columns  
+
+preProc <- preProcess()
+```
+
 
 ## kNN
 
-Fit a kNN model and use a 10 fold cross-validation repeated 3 times.
+Fit a kNN model and use a 10 fold cross-validation 
+
+Train the kNN Model by repeating the 10 fold cross-validation 3 times.
+
+```{r kNN}
+knnFit <- knn(train = select(heartTrain, Age, RestingBP, MaxHR),
+                              test = select(heartTest, Age, RestingBP, MaxHR),
+                              cl = heartTrain$HeartDisease,
+                              method = "knn",
+                              preProcess = c("center","scale"),
+                              k=3)
+```
 
 Center and scale data
 
 ## Logistic Regression
 
 Posit three different logistic regression models and fit those models on the training set, using repeated CV as done above.
+```{r}
+glmFit1 <- glm(HeartDisease ~ RestingBP, data = heartTrain, family = "binomial")
+predict(glmFit1, newdata = heartTest, type = "response", se.fit=TRUE)
+
+glmFit1 <- train(
+  HeartDisease ~ .,
+  data = heartTrain,
+  method =  "glm",
+  family = "binomial",
+  preProcess = c("center", "scale"),
+  trControl = trainControl(method = "cv", number = 10)
+)
+summary(glmFit1)
+confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit1, newdata = heartTest))
+
+pred <- predict(glmFit1, newdata = heartTest)
+postResample(pred, obs = heartTest$HeartDisease)
+confusionMatrix(data = heartTest$HeartDisease, reference = pred)
+
+#Fit Cholesterol & Age with Resting BP, Age, & Sex
+glmFit2 <- train(
+  HeartDisease ~ Cholesterol*Age + RestingBP*Age*Sex,
+  data = heartTrain,
+  method =  "glm",
+  family = "binomial",
+  preProcess = c("center", "scale"),
+  trControl = trainControl(method = "cv", number = 10)
+)
+summary(glmFit2)
+confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit2, newdata = heartTest))
+
+
+#Fit Resting BP, Age, & Sex wit Chest Pain Type, Age, & Sex
+glmFit3 <- train(
+  HeartDisease ~  RestingBP*Age*Sex + ChestPainType*Age*Sex,
+  data = heartTrain,
+  method =  "glm",
+  family = "binomial",
+  preProcess = c("center", "scale"),
+  trControl = trainControl(method = "cv", number = 10)
+)
+r <- summary(glmFit3)
+r2 <- confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit3, newdata = heartTest))
+r2 <- conf
+```
 
 Identify your best model and provide a basic summary of it.
 
