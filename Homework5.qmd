@@ -1,0 +1,89 @@
+---
+title: "ST558: Homework 5 - Fitting Models"
+author: "Lamia Benyamine"
+date: "July 16, 2024"
+format: html
+editor: visual
+---
+
+# *Task 1:* Conceptual Questions
+
+1.  What is the purpose of using cross-validation when fitting a random forest model?
+    -   To choose the tuning parameter and split the data.
+2.  Describe the bagged tree algorithm.
+    -   Bagging is a general method of bootstrap aggregation.
+3.  What is meant by a general linear model?
+    -   A general linear model is using a continuous response variable, but allows for both continuous and categorical predictor variables.
+4.  When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?
+    -   Adding interactions terms adds more explanatory variables to the model. This could describe the data more and allow for a model with a better fit.
+5.  Why do we split our data into a training and test set?
+
+# *Task 2:* Fitting Models
+
+This report will be using a Heart Failure Prediction Data set that was created by combining 5 heart data sets with 12 variables. The five data sets used are:
+
+Cleveland: 303 observations\
+Hungarian: 294 observations\
+Switzerland: 123 observations\
+Long Beach VA: 200 observations\
+Stalog (Heart) Data Set: 270 observations\
+Total: 1190 observations - Duplicated: 272 observations = **Final data set:** 918 observations
+
+## Quick EDA/Data Preparation
+
+Load libraries necessary for this analysis.
+
+```{r libraries, warning = FALSE, message=FALSE}
+library(readr)
+library(tidyr)
+library(dplyr)
+```
+
+Read in the data as a tibble and display a few rows.
+
+```{r read csv}
+heart_tb <- as_tibble(read_csv("heart.csv", show_col_types = FALSE))
+head(heart_tb)
+```
+
+1.  Quickly understand your data. Check on missingness and summarize the data, especially with respect to the relationships of the variables to HeartDisease.
+
+```{r summary}
+#Determine if there is any missing data in any column
+colSums(is.na(heart_tb))
+#View a basic data validation summary table
+psych::describe(heart_tb)
+
+#Review the rows with 0 values
+heart_tb |>
+  filter(Cholesterol == 0 | RestingBP == 0)
+```
+-   There is are not any entries with NA, but note there are observations with a RestingBP or Cholesterol equal to 0, which is most likely an error in the data.
+
+2.  Create a new variable that is a factor version of the HeartDisease variable (if needed, this depends on how you read in your data). Remove the ST_Slope variable and the original HeartDisease variable (if applicable).
+
+3.  We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors (although we could try to create our own loss function as an alternative). In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina ChestPainType, and RestingECG.
+
+## Split Data
+
+Split your data into a training and test set.
+
+## kNN
+
+Fit a kNN model and use a 10 fold cross-validation repeated 3 times.
+
+Center and scale data
+
+## Logistic Regression
+
+Posit three different logistic regression models and fit those models on the training set, using repeated CV as done above.
+
+Identify your best model and provide a basic summary of it.
+
+Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.
+
+## Tree Models
+
+## Wrap Up
+
+Which model overall did the best job (in terms of accuracy) on the test set?
