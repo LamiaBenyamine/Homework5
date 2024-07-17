@@ -11,12 +11,13 @@ editor: visual
 1.  What is the purpose of using cross-validation when fitting a random forest model?
     -   To choose the tuning parameter and split the data.
 2.  Describe the bagged tree algorithm.
-    -   Bagging is a general method of bootstrap aggregation.
+    -   Bagging is a general method of bootstrap aggregation which gets multiple samples to fit on resample from the data or a fitted model.
 3.  What is meant by a general linear model?
     -   A general linear model is using a continuous response variable, but allows for both continuous and categorical predictor variables.
 4.  When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?
-    -   Adding interactions terms adds more explanatory variables to the model. This could describe the data more and allow for a model with a better fit.
+    -   Adding interactions terms adds more explanatory variables to the model. This could describe the data more and allow for a model with a better fit or it could over fit the model. It allows the model to extend from a simple to a multiple linear regression.
 5.  Why do we split our data into a training and test set?
+    -   We split the data to train the model based on the training set, and then actually test the prediction of the model on the test set.
 
 # *Task 2:* Fitting Models
 
@@ -43,6 +44,9 @@ library(GGally)
 library(class)
 library(caret)
 library(randomForest)
+library(tree)
+library(rpart.plot)
+library(gbm)
 ```
 
 Read in the data as a tibble and display a few rows.
@@ -93,7 +97,6 @@ psych::describe(heart_tb)
 
 #display a few rows of the data
 head(heart_tb)
-
 ```
 
 ```{r EDA summary 2}
@@ -147,8 +150,10 @@ ggplot(data = g3, aes(x = RestingECG, y =count, fill = HeartDisease)) +
   ggtitle("Heart disease by resting ECG and type of chest pain") +
   theme_light()
 ```
+
 View basic Linear regression models by Age and Max Heart Rate.
-```{r}
+
+```{r, message=FALSE}
 distSum <- heart_tb |>
   group_by(Age) |>
   summarize(propDisease = mean((as.numeric(HeartDisease)-1)), n = n())
@@ -168,7 +173,7 @@ ggplot(distSum, aes(x = MaxHR, y = propDisease)) +
 
 3.  We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors. In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina, ChestPainType, and RestingECG.
 
-```{r dummy var}
+```{r dummy var, warning=FALSE}
 dummies <- dummyVars(HeartDisease ~ ., data = heart_tb)
 heart_tb2 <- head(predict(dummies, newdata = heart_tb))
 ```
@@ -188,35 +193,26 @@ heartTrain <- heart_tb[heartIndex, ]
 heartTest <- heart_tb[-heartIndex, ]
 ```
 
-```{r}
-#standardize all numeric columns  
-
-preProc <- preProcess()
-```
-
-
 ## kNN
 
-Fit a kNN model and use a 10 fold cross-validation 
-
-Train the kNN Model by repeating the 10 fold cross-validation 3 times.
+Fit a kNN model and use a 10 fold cross-validation. Train the kNN Model by repeating the 10 fold cross-validation 3 times.
 
 ```{r kNN}
 knnFit <- knn(train = select(heartTrain, Age, RestingBP, MaxHR),
                               test = select(heartTest, Age, RestingBP, MaxHR),
                               cl = heartTrain$HeartDisease,
                               method = "knn",
-                              preProcess = c("center","scale"),
+                              preProcess = c("center", "scale"),
+                              trControl = trainControl(method = "repeatedcv", number = 10, repeats = 3),
                               k=3)
 ```
-
-Center and scale data
 
 ## Logistic Regression
 
 Posit three different logistic regression models and fit those models on the training set, using repeated CV as done above.
 
-From the EDA, 
+From the EDA,
+
 ```{r}
 glmFit1 <- train(
   HeartDisease ~ .,
@@ -259,19 +255,112 @@ fitStats
 Identify your best model and provide a basic summary of it.
 
 -   The best model is Fit1 because it has the lowest AIC value and highest accuracy.
+
 ```{r}
 #Summary of best model
 summary(glmFit1)
 ```
 
 Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.
+
 ```{r}
 confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit1, newdata = heartTest))
 ```
+
 -   Fit1 still has a high accuracy after predicting using the test data set based on the confusion matrix.
 
 ## Tree Models
 
+In this section we’ll fit a few different tree based models in a similar way as above! Choose your own variables of interest. Use repeated 10 fold CV to select a best:
+
+-   classification tree model (use method = rpart: tuning parameter is cp, use values 0, 0.001, 0.002, . . . , 0.1). Center and scale the data.
+
+```{r}
+#Tree model using MaxHR, RestingBP, Age, and Cholesterol as predictors
+treeFit1 <- train(HeartDisease ~ ChestPainType + ExerciseAngina, 
+                  data = heartTrain,
+                  method = "rpart",
+                  preProcess = c("center", "scale"),
+                  trControl = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3)
+)
+#Print the summary and view the cp values to determine the optimal size tree
+treeFit1$results
+treeFit1$bestTune
+
+#Plot the classification tree
+rpart.plot(treeFit1$finalModel, main="Classification Tree for Heart Disease")
+```
+
+> *Based on the lowest cp values and highest accuracy, the final used for the model was cp = 0.02787.*
+
+-   a random forest (use method = rf: tuning parameter is mtry, use values of 1, 2, . . . , \# of predictors (bagging is a special case here m=p!) There are 4 classification variables so m = 4. Center and scale the data.
+
+```{r, warning = FALSE}
+#set the bootstrap sample for test and train data
+set.seed(10)
+#80% in training set
+train <- sample(1:nrow(heart_tb), size = nrow(heart_tb)*0.8)
+#20% in test set
+test <- dplyr::setdiff(1:nrow(heart_tb), train)
+
+heartTrain2 <- heart_tb[train, ]
+heartTest2 <- heart_tb[test, ]
+
+#Get the bagged model fit
+treeFit2 <- train(HeartDisease ~., data = heartTrain2,
+                  method = "rf",
+                  preProcess = c("center", "scale"),
+                  trControl = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3),
+                  tuneGrid = data.frame(mtry = 1:4)
+)
+#Print the summary and best option
+treeFit2$results
+treeFit2$bestTune
+```
+
+> *Based on the highest accuracy, the final value used for the model was mtry = 2.*
+
+-   a boosted tree (use method = gbm: tuning parameters are n.trees, interaction.depth, shrinkage, and n.minobsinnode, use all combinations of n.trees of 25, 50, 100, and 200, interaction.depth of 1, 2, 3, shrinkage = 0.1, and nminobsinnode = 10; Hint: use expand.grid() to create your data frame for tuneGrid and verbose = FALSE limits the output produced. Center and scale the data.
+
+```{r boosted}
+ntree <- c(25, 50, 100, 200)
+intDep <- c(1, 2, 3)
+shrink <- c(0.1)
+nmin <- c(10)
+gbmGrid <- expand.grid(n.trees = ntree, interaction.depth = intDep, shrinkage = shrink, n.minobsinnode = nmin)
+
+treeFit3 <- train(HeartDisease ~ ., data = heartTrain2, method = "gbm",
+                distribution = "bernoulli", 
+                preProcess = c("center", "scale"),
+                tuneGrid = gbmGrid, 
+                trControl = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3),
+                verbose = FALSE)
+#Print the summary and best option
+treeFit3$results
+treeFit3$bestTune
+```
+
+> *Based on the highest accuracy, the final values used for the model were n.trees = 100, interaction.depth = 3, shrinkage = 0.1 and n.minobsinnode = 10.*
+
+Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function.
+
+```{r}
+stat1 <- round(confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit1, newdata = heartTest2))$overall,4)
+stat2 <- round(confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit2, newdata = heartTest2))$overall,4)
+stat3 <- round(confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit3, newdata = heartTest2))$overall,4)
+
+#Combine the statistics to view in a table
+fitTreeStats <- data.frame(rpart = stat1, rf = stat2, boosted = stat3)
+fitTreeStats
+```
+
+> *Based on the highest accuracy, the best model is the random forest model.*
+
 ## Wrap Up
 
 Which model overall did the best job (in terms of accuracy) on the test set?
+
+> *Based on the highest accuracy, the final values used for the model were n.trees = 100, interaction.depth = 3, shrinkage = 0.1 and n.minobsinnode = 10.*
