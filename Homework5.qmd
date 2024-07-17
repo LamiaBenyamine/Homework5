@@ -34,7 +34,7 @@ Total: 1190 observations - Duplicated: 272 observations = **Final data set:** 91
 
 Load libraries necessary for this analysis.
 
-```{r libraries, echo = FALSE, message = FALSE, warning = FALSE}
+```{r libraries, message = FALSE, warning = FALSE}
 library(readr)
 library(tidyr)
 library(dplyr)
@@ -64,7 +64,7 @@ head(heart_tb)
 #Determine if there is any missing data in any column
 colSums(is.na(heart_tb))
 #View a basic data validation summary table
-psych::describe(heart_tb)
+psych::describe(heart_tb, skew = FALSE, omit = TRUE)
 
 #Review the rows with 0 values
 heart_tb |>
@@ -93,11 +93,12 @@ heart_tb <- heart_tb |>
   replace_na(list(Cholesterol = mean(heart_tb$Cholesterol, na.rm = TRUE),
                   RestingBP = mean(heart_tb$RestingBP, na.rm = TRUE)))
 #View a basic data validation summary table. Note the changes to Cholesterol and RestingBP
-psych::describe(heart_tb)
+psych::describe(heart_tb, skew = FALSE, omit = TRUE)
 
 #display a few rows of the data
 head(heart_tb)
 ```
+Create plots to visualize the data.
 
 ```{r EDA summary 2}
 #Numerical Data
@@ -150,6 +151,8 @@ ggplot(data = g3, aes(x = RestingECG, y =count, fill = HeartDisease)) +
   ggtitle("Heart disease by resting ECG and type of chest pain") +
   theme_light()
 ```
+### Review EDA
+From the EDA, there aren't any highly correlated numerical values. The categorical variables shows a large amount of heart disease male patients with asymptomatic chest pain. There are also higher instances of heart disease in male patients with a normal resting electrocardiogram. We will take these observations and use them to create prediction models.
 
 View basic Linear regression models by Age and Max Heart Rate.
 
@@ -172,6 +175,8 @@ ggplot(distSum, aes(x = MaxHR, y = propDisease)) +
 ```
 
 3.  We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors. In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina, ChestPainType, and RestingECG.
+
+Create dummy columns corresponding to the values of these four variables for use in our kNN fit
 
 ```{r dummy var, warning=FALSE}
 dummies <- dummyVars(HeartDisease ~ ., data = heart_tb)
@@ -224,8 +229,6 @@ knnPred
 
 Posit three different logistic regression models and fit those models on the training set, using repeated CV as done above.
 
-From the EDA,
-
 ```{r}
 #Fit all predictor variables
 glmFit1 <- train(
@@ -260,7 +263,7 @@ glmFit3 <- train(
                               number = 10, repeats = 3)
 )
 #Summary table to determine the best model
-fitStats <- data.frame(Fit = c("Fit1", "Fit2", "Fit3"),
+fitStats <- data.frame(glmFit = c("Fit1", "Fit2", "Fit3"),
                       Accuracy = c(glmFit1$results$Accuracy, glmFit3$results$Accuracy, glmFit3$results$Accuracy),
                       AIC = c(summary(glmFit1)$aic, summary(glmFit2)$aic, summary(glmFit3)$aic))
 fitStats
@@ -268,7 +271,7 @@ fitStats
 
 Identify your best model and provide a basic summary of it.
 
--   The best model is Fit1 because it has the lowest AIC value and highest accuracy.
+> *The best model is Fit1 because it has the lowest AIC value and highest accuracy.*
 
 ```{r}
 #Summary of best model
@@ -282,7 +285,7 @@ glmPred <- confusionMatrix(data = heartTest$HeartDisease, reference = predict(gl
 glmPred
 ```
 
--   Fit1 still has a high accuracy after predicting using the test data set based on the confusion matrix.
+> *Fit1 still has a high accuracy after predicting using the test data set based on the confusion matrix.*
 
 ## Tree Models
 

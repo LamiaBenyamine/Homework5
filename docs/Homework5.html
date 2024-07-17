@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Lamia Benyamine">
+<meta name="dcterms.date" content="2024-07-16">
+
+<title>ST558: Homework 5 - Fitting Models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ST558: Homework 5 - Fitting Models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Lamia Benyamine </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 16, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="task-1-conceptual-questions" class="level1">
+<h1><em>Task 1:</em> Conceptual Questions</h1>
+<ol type="1">
+<li>What is the purpose of using cross-validation when fitting a random forest model?
+<ul>
+<li>To choose the tuning parameter and split the data.</li>
+</ul></li>
+<li>Describe the bagged tree algorithm.
+<ul>
+<li>Bagging is a general method of bootstrap aggregation which gets multiple samples to fit on resample from the data or a fitted model.</li>
+</ul></li>
+<li>What is meant by a general linear model?
+<ul>
+<li>A general linear model is using a continuous response variable, but allows for both continuous and categorical predictor variables.</li>
+</ul></li>
+<li>When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?
+<ul>
+<li>Adding interactions terms adds more explanatory variables to the model. This could describe the data more and allow for a model with a better fit or it could over fit the model. It allows the model to extend from a simple to a multiple linear regression.</li>
+</ul></li>
+<li>Why do we split our data into a training and test set?
+<ul>
+<li>We split the data to train the model based on the training set, and then actually test the prediction of the model on the test set.</li>
+</ul></li>
+</ol>
+</section>
+<section id="task-2-fitting-models" class="level1">
+<h1><em>Task 2:</em> Fitting Models</h1>
+<p>This report will be using a Heart Failure Prediction Data set that was created by combining 5 heart data sets with 12 variables. The five data sets used are:</p>
+<p>Cleveland: 303 observations<br>
+Hungarian: 294 observations<br>
+Switzerland: 123 observations<br>
+Long Beach VA: 200 observations<br>
+Stalog (Heart) Data Set: 270 observations<br>
+Total: 1190 observations - Duplicated: 272 observations = <strong>Final data set:</strong> 918 observations</p>
+<section id="quick-edadata-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="quick-edadata-preparation">Quick EDA/Data Preparation</h2>
+<p>Load libraries necessary for this analysis.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(class)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tree)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gbm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Read in the data as a tibble and display a few rows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>heart_tb <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">read_csv</span>(<span class="st">"heart.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#display a few rows of the data</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(heart_tb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 12
+    Age Sex   ChestPainType RestingBP Cholesterol FastingBS RestingECG MaxHR
+  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;
+1    40 M     ATA                 140         289         0 Normal       172
+2    49 F     NAP                 160         180         0 Normal       156
+3    37 M     ATA                 130         283         0 ST            98
+4    48 F     ASY                 138         214         0 Normal       108
+5    54 M     NAP                 150         195         0 Normal       122
+6    39 M     NAP                 120         339         0 Normal       170
+# ℹ 4 more variables: ExerciseAngina &lt;chr&gt;, Oldpeak &lt;dbl&gt;, ST_Slope &lt;chr&gt;,
+#   HeartDisease &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<ol type="1">
+<li>Quickly understand your data. Check on missingness and summarize the data, especially with respect to the relationships of the variables to HeartDisease.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Determine if there is any missing data in any column</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(heart_tb))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Age            Sex  ChestPainType      RestingBP    Cholesterol 
+             0              0              0              0              0 
+     FastingBS     RestingECG          MaxHR ExerciseAngina        Oldpeak 
+             0              0              0              0              0 
+      ST_Slope   HeartDisease 
+             0              0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#View a basic data validation summary table</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>psych<span class="sc">::</span><span class="fu">describe</span>(heart_tb, <span class="at">skew =</span> <span class="cn">FALSE</span>, <span class="at">omit =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             vars   n   mean     sd median  min   max range   se
+Age             1 918  53.51   9.43   54.0 28.0  77.0  49.0 0.31
+RestingBP       4 918 132.40  18.51  130.0  0.0 200.0 200.0 0.61
+Cholesterol     5 918 198.80 109.38  223.0  0.0 603.0 603.0 3.61
+FastingBS       6 918   0.23   0.42    0.0  0.0   1.0   1.0 0.01
+MaxHR           8 918 136.81  25.46  138.0 60.0 202.0 142.0 0.84
+Oldpeak        10 918   0.89   1.07    0.6 -2.6   6.2   8.8 0.04
+HeartDisease   12 918   0.55   0.50    1.0  0.0   1.0   1.0 0.02</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Review the rows with 0 values</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>heart_tb <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Cholesterol <span class="sc">==</span> <span class="dv">0</span> <span class="sc">|</span> RestingBP <span class="sc">==</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 172 × 12
+     Age Sex   ChestPainType RestingBP Cholesterol FastingBS RestingECG MaxHR
+   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;
+ 1    65 M     ASY                 115           0         0 Normal        93
+ 2    32 M     TA                   95           0         1 Normal       127
+ 3    61 M     ASY                 105           0         1 Normal       110
+ 4    50 M     ASY                 145           0         1 Normal       139
+ 5    57 M     ASY                 110           0         1 ST           131
+ 6    51 M     ASY                 110           0         1 Normal        92
+ 7    47 M     ASY                 110           0         1 ST           149
+ 8    60 M     ASY                 160           0         1 Normal       149
+ 9    55 M     ATA                 140           0         0 ST           150
+10    53 M     ASY                 125           0         1 Normal       120
+# ℹ 162 more rows
+# ℹ 4 more variables: ExerciseAngina &lt;chr&gt;, Oldpeak &lt;dbl&gt;, ST_Slope &lt;chr&gt;,
+#   HeartDisease &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<ul>
+<li>There are not any entries with NA, but note there are observations with a RestingBP or Cholesterol equal to 0, which is most likely an error in the data. These entries will be replaced with NA, then imputed with mean values. This way the 0 values do not impact the mean.</li>
+</ul>
+<ol start="2" type="1">
+<li>Create a new variable that is a factor version of the HeartDisease variable. Remove the ST_Slope variable variable.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create factor variables</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>heart_tb<span class="sc">$</span>HeartDisease <span class="ot">=</span> <span class="fu">as.factor</span>(heart_tb<span class="sc">$</span>HeartDisease)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>heart_tb<span class="sc">$</span>Sex <span class="ot">=</span> <span class="fu">as.factor</span>(heart_tb<span class="sc">$</span>Sex)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>heart_tb<span class="sc">$</span>ExerciseAngina <span class="ot">=</span> <span class="fu">as.factor</span>(heart_tb<span class="sc">$</span>ExerciseAngina)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>heart_tb<span class="sc">$</span>ChestPainType <span class="ot">=</span> <span class="fu">as.factor</span>(heart_tb<span class="sc">$</span>ChestPainType)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>heart_tb<span class="sc">$</span>RestingECG <span class="ot">=</span> <span class="fu">as.factor</span>(heart_tb<span class="sc">$</span>RestingECG)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>heart_tb<span class="sc">$</span>FastingBS <span class="ot">=</span> <span class="fu">as.character</span>(heart_tb<span class="sc">$</span>FastingBS)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#remove column</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>heart_tb <span class="ot">=</span> <span class="fu">select</span>(heart_tb,<span class="sc">-</span>ST_Slope)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Replace 0 values in cholesterol and restingBP to NA, to then impute values with mean of the respective column</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>heart_tb[,<span class="fu">c</span>(<span class="st">'Cholesterol'</span>, <span class="st">'RestingBP'</span>)][heart_tb[,<span class="fu">c</span>(<span class="st">'Cholesterol'</span>, <span class="st">'RestingBP'</span>)] <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>heart_tb <span class="ot">&lt;-</span> heart_tb <span class="sc">|&gt;</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">Cholesterol =</span> <span class="fu">mean</span>(heart_tb<span class="sc">$</span>Cholesterol, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">RestingBP =</span> <span class="fu">mean</span>(heart_tb<span class="sc">$</span>RestingBP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#View a basic data validation summary table. Note the changes to Cholesterol and RestingBP</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>psych<span class="sc">::</span><span class="fu">describe</span>(heart_tb, <span class="at">skew =</span> <span class="cn">FALSE</span>, <span class="at">omit =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            vars   n   mean    sd median  min   max range   se
+Age            1 918  53.51  9.43  54.00 28.0  77.0  49.0 0.31
+RestingBP      4 918 132.54 17.99 130.00 80.0 200.0 120.0 0.59
+Cholesterol    5 918 244.64 53.32 244.64 85.0 603.0 518.0 1.76
+MaxHR          8 918 136.81 25.46 138.00 60.0 202.0 142.0 0.84
+Oldpeak       10 918   0.89  1.07   0.60 -2.6   6.2   8.8 0.04</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#display a few rows of the data</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(heart_tb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 11
+    Age Sex   ChestPainType RestingBP Cholesterol FastingBS RestingECG MaxHR
+  &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     &lt;fct&gt;      &lt;dbl&gt;
+1    40 M     ATA                 140         289 0         Normal       172
+2    49 F     NAP                 160         180 0         Normal       156
+3    37 M     ATA                 130         283 0         ST            98
+4    48 F     ASY                 138         214 0         Normal       108
+5    54 M     NAP                 150         195 0         Normal       122
+6    39 M     NAP                 120         339 0         Normal       170
+# ℹ 3 more variables: ExerciseAngina &lt;fct&gt;, Oldpeak &lt;dbl&gt;, HeartDisease &lt;fct&gt;</code></pre>
+</div>
+</div>
+<p>Create plots to visualize the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Numerical Data</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>heart_tb <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric), <span class="sc">-</span>HeartDisease) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"var"</span>, <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">fill =</span> var)) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> var, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span> <span class="co">#create a plot for each variable in a grid</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">"Distribution Plots for Numeric Variables"</span>) <span class="sc">+</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span> <span class="co">#remove legend</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/EDA summary 2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Find correlated variables</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>heart_tb <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggcorr</span>(<span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">palette =</span> <span class="st">"PuOr"</span>, <span class="at">name =</span> <span class="st">"Correlation"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/EDA summary 2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Review categorical variables</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> heart_tb <span class="sc">|&gt;</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(HeartDisease, Sex, ChestPainType) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(HeartDisease, Sex, ChestPainType) <span class="sc">|&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> g1, <span class="fu">aes</span>(<span class="at">x =</span> Sex, <span class="at">y =</span>count, <span class="at">fill =</span> HeartDisease)) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> ChestPainType) <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Heart disease by sex and type of chest pain"</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/EDA summary 2-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> heart_tb <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(HeartDisease, Sex, RestingECG) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(HeartDisease, Sex, RestingECG) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> g2, <span class="fu">aes</span>(<span class="at">x =</span> Sex, <span class="at">y =</span>count, <span class="at">fill =</span> HeartDisease)) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> RestingECG) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Heart disease by sex and resting ECG"</span>) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/EDA summary 2-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>g3 <span class="ot">&lt;-</span> heart_tb <span class="sc">|&gt;</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(HeartDisease, ChestPainType, RestingECG) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(HeartDisease, ChestPainType, RestingECG) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> g3, <span class="fu">aes</span>(<span class="at">x =</span> RestingECG, <span class="at">y =</span>count, <span class="at">fill =</span> HeartDisease)) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> ChestPainType) <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Heart disease by resting ECG and type of chest pain"</span>) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/EDA summary 2-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="review-eda" class="level3">
+<h3 class="anchored" data-anchor-id="review-eda">Review EDA</h3>
+<p>From the EDA, there aren’t any highly correlated numerical values. The categorical variables shows a large amount of heart disease male patients with asymptomatic chest pain. There are also higher instances of heart disease in male patients with a normal resting electrocardiogram. We will take these observations and use them to create prediction models.</p>
+<p>View basic Linear regression models by Age and Max Heart Rate.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>distSum <span class="ot">&lt;-</span> heart_tb <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Age) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">propDisease =</span> <span class="fu">mean</span>((<span class="fu">as.numeric</span>(HeartDisease)<span class="sc">-</span><span class="dv">1</span>)), <span class="at">n =</span> <span class="fu">n</span>())</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(distSum, <span class="fu">aes</span>(<span class="at">x =</span> Age, <span class="at">y =</span> propDisease)) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="fu">aes</span>(<span class="at">size =</span> n)) <span class="sc">+</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">data =</span> heart_tb, <span class="fu">aes</span>(<span class="at">x =</span> Age, <span class="at">y =</span> <span class="fu">as.numeric</span>(HeartDisease)<span class="sc">-</span><span class="dv">1</span>), <span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Linear Regression Model: Heart diesease by Age"</span>) <span class="sc">+</span> <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>distSum <span class="ot">&lt;-</span> heart_tb <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MaxHR) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">propDisease =</span> <span class="fu">mean</span>((<span class="fu">as.numeric</span>(HeartDisease)<span class="sc">-</span><span class="dv">1</span>)), <span class="at">n =</span> <span class="fu">n</span>())</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(distSum, <span class="fu">aes</span>(<span class="at">x =</span> MaxHR, <span class="at">y =</span> propDisease)) <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="fu">aes</span>(<span class="at">size =</span> n)) <span class="sc">+</span> </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_smooth</span>(<span class="at">data =</span> heart_tb, <span class="fu">aes</span>(<span class="at">x =</span> MaxHR, <span class="at">y =</span> <span class="fu">as.numeric</span>(HeartDisease)<span class="sc">-</span><span class="dv">1</span>), <span class="at">method =</span> <span class="st">"glm"</span>, <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>)) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Linear Regression Model: Heart diesease by Max Heart Rate"</span>) <span class="sc">+</span> <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors. In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina, ChestPainType, and RestingECG.</li>
+</ol>
+<p>Create dummy columns corresponding to the values of these four variables for use in our kNN fit</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dummies <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(HeartDisease <span class="sc">~</span> ., <span class="at">data =</span> heart_tb)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>heart_tb2 <span class="ot">&lt;-</span> <span class="fu">head</span>(<span class="fu">predict</span>(dummies, <span class="at">newdata =</span> heart_tb))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="split-data" class="level2">
+<h2 class="anchored" data-anchor-id="split-data">Split Data</h2>
+<p>Split your data into a training and test set with 70:30 ratio.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Set seed to get the same training and test set each time</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>heartIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(heart_tb<span class="sc">$</span>HeartDisease, <span class="at">p =</span> <span class="fl">0.7</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(heartIndex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Resample1
+[1,]         2
+[2,]         4
+[3,]         6
+[4,]         9
+[5,]        11
+[6,]        12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Training set receives 70% of data</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>heartTrain <span class="ot">&lt;-</span> heart_tb[heartIndex, ]</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing set receives 30% of data</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>heartTest <span class="ot">&lt;-</span> heart_tb[<span class="sc">-</span>heartIndex, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="knn" class="level2">
+<h2 class="anchored" data-anchor-id="knn">kNN</h2>
+<p>Fit a kNN model and use a 10 fold cross-validation. Train the kNN Model by repeating the 10 fold cross-validation 3 times and set k to be values from 1 to 40.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>knnFit <span class="ot">&lt;-</span> <span class="fu">train</span>(HeartDisease <span class="sc">~</span>  ., </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">data =</span> heartTrain,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                              <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                                       <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">40</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(knnFit, <span class="at">main =</span> <span class="st">"Accuracy based on number of k neighbors"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/kNN train-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Based on the highest accuracy, the final value used for the model was k = 3.</em></p>
+</blockquote>
+<p>Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>knnPred <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> heartTest<span class="sc">$</span>HeartDisease, <span class="at">reference =</span> <span class="fu">predict</span>(knnFit, <span class="at">newdata =</span> heartTest))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>knnPred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 103  20
+         1  31 121
+                                          
+               Accuracy : 0.8145          
+                 95% CI : (0.7635, 0.8587)
+    No Information Rate : 0.5127          
+    P-Value [Acc &gt; NIR] : &lt;2e-16          
+                                          
+                  Kappa : 0.6281          
+                                          
+ Mcnemar's Test P-Value : 0.1614          
+                                          
+            Sensitivity : 0.7687          
+            Specificity : 0.8582          
+         Pos Pred Value : 0.8374          
+         Neg Pred Value : 0.7961          
+             Prevalence : 0.4873          
+         Detection Rate : 0.3745          
+   Detection Prevalence : 0.4473          
+      Balanced Accuracy : 0.8134          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>The kNN fit still has a high accuracy after predicting using the test data set based on the confusion matrix.</em></p>
+</blockquote>
+</section>
+<section id="logistic-regression" class="level2">
+<h2 class="anchored" data-anchor-id="logistic-regression">Logistic Regression</h2>
+<p>Posit three different logistic regression models and fit those models on the training set, using repeated CV as done above.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Fit all predictor variables</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>glmFit1 <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  HeartDisease <span class="sc">~</span> .,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heartTrain,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span>  <span class="st">"glm"</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>                              <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Fit Cholesterol &amp; Age with Resting BP, Age, &amp; Sex</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>glmFit2 <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  HeartDisease <span class="sc">~</span> Cholesterol<span class="sc">*</span>Age <span class="sc">+</span> RestingBP<span class="sc">*</span>Age<span class="sc">*</span>Sex,</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heartTrain,</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span>  <span class="st">"glm"</span>,</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>)</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="co">#Fit Resting BP, Age, &amp; Sex with Chest Pain Type, Age, &amp; Sex with Max HR and Sex</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>glmFit3 <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  HeartDisease <span class="sc">~</span>  RestingBP<span class="sc">*</span>Age<span class="sc">*</span>Sex <span class="sc">+</span> ChestPainType<span class="sc">*</span>Age<span class="sc">*</span>Sex <span class="sc">+</span> MaxHR<span class="sc">*</span>Sex,</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heartTrain,</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span>  <span class="st">"glm"</span>,</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>                              <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>)</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Summary table to determine the best model</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>fitStats <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">glmFit =</span> <span class="fu">c</span>(<span class="st">"Fit1"</span>, <span class="st">"Fit2"</span>, <span class="st">"Fit3"</span>),</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Accuracy =</span> <span class="fu">c</span>(glmFit1<span class="sc">$</span>results<span class="sc">$</span>Accuracy, glmFit3<span class="sc">$</span>results<span class="sc">$</span>Accuracy, glmFit3<span class="sc">$</span>results<span class="sc">$</span>Accuracy),</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">AIC =</span> <span class="fu">c</span>(<span class="fu">summary</span>(glmFit1)<span class="sc">$</span>aic, <span class="fu">summary</span>(glmFit2)<span class="sc">$</span>aic, <span class="fu">summary</span>(glmFit3)<span class="sc">$</span>aic))</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>fitStats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  glmFit  Accuracy      AIC
+1   Fit1 0.8256922 523.7054
+2   Fit2 0.7791966 792.9204
+3   Fit3 0.7791966 621.3487</code></pre>
+</div>
+</div>
+<p>Identify your best model and provide a basic summary of it.</p>
+<blockquote class="blockquote">
+<p><em>The best model is Fit1 because it has the lowest AIC value and highest accuracy.</em></p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Summary of best model</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(glmFit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+NULL
+
+Coefficients:
+                 Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)       0.39757    0.11945   3.328 0.000873 ***
+Age               0.01029    0.13337   0.077 0.938486    
+SexM              0.50747    0.12133   4.183 2.88e-05 ***
+ChestPainTypeATA -0.81868    0.13367  -6.124 9.10e-10 ***
+ChestPainTypeNAP -0.61556    0.11338  -5.429 5.66e-08 ***
+ChestPainTypeTA  -0.32594    0.10336  -3.154 0.001613 ** 
+RestingBP         0.02014    0.11838   0.170 0.864893    
+Cholesterol       0.23964    0.11646   2.058 0.039628 *  
+FastingBS1        0.63031    0.12420   5.075 3.87e-07 ***
+RestingECGNormal  0.19742    0.14713   1.342 0.179642    
+RestingECGST      0.06938    0.15017   0.462 0.644088    
+MaxHR            -0.46330    0.12868  -3.600 0.000318 ***
+ExerciseAnginaY   0.62213    0.12750   4.879 1.06e-06 ***
+Oldpeak           0.66017    0.13306   4.962 6.99e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 883.97  on 642  degrees of freedom
+Residual deviance: 495.71  on 629  degrees of freedom
+AIC: 523.71
+
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+</div>
+<p>Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>glmPred <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> heartTest<span class="sc">$</span>HeartDisease, <span class="at">reference =</span> <span class="fu">predict</span>(glmFit1, <span class="at">newdata =</span> heartTest))</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>glmPred</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0  99  24
+         1  34 118
+                                          
+               Accuracy : 0.7891          
+                 95% CI : (0.7361, 0.8358)
+    No Information Rate : 0.5164          
+    P-Value [Acc &gt; NIR] : &lt;2e-16          
+                                          
+                  Kappa : 0.5767          
+                                          
+ Mcnemar's Test P-Value : 0.2373          
+                                          
+            Sensitivity : 0.7444          
+            Specificity : 0.8310          
+         Pos Pred Value : 0.8049          
+         Neg Pred Value : 0.7763          
+             Prevalence : 0.4836          
+         Detection Rate : 0.3600          
+   Detection Prevalence : 0.4473          
+      Balanced Accuracy : 0.7877          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Fit1 still has a high accuracy after predicting using the test data set based on the confusion matrix.</em></p>
+</blockquote>
+</section>
+<section id="tree-models" class="level2">
+<h2 class="anchored" data-anchor-id="tree-models">Tree Models</h2>
+<p>In this section we’ll fit a few different tree based models in a similar way as above! Choose your own variables of interest. Use repeated 10 fold CV to select a best:</p>
+<ul>
+<li>classification tree model (use method = rpart: tuning parameter is cp, use values 0, 0.001, 0.002, . . . , 0.1). Center and scale the data.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Tree model using MaxHR, RestingBP, Age, and Cholesterol as predictors</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>treeFit1 <span class="ot">&lt;-</span> <span class="fu">train</span>(HeartDisease <span class="sc">~</span> ChestPainType <span class="sc">+</span> ExerciseAngina, </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> heartTrain,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"rpart"</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Print the summary and view the cp values to determine the optimal size tree</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>treeFit1<span class="sc">$</span>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          cp  Accuracy     Kappa AccuracySD    KappaSD
+1 0.02787456 0.7765849 0.5377443 0.04731890 0.09882318
+2 0.05226481 0.7410157 0.4773720 0.05337881 0.10154908
+3 0.40418118 0.6322863 0.2255625 0.07168055 0.20374938</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>treeFit1<span class="sc">$</span>bestTune</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          cp
+1 0.02787456</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot the classification tree</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rpart.plot</span>(treeFit1<span class="sc">$</span>finalModel, <span class="at">main=</span><span class="st">"Classification Tree for Heart Disease"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Homework5_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Based on the lowest cp values and highest accuracy, the final used for the model was cp = 0.02787.</em></p>
+</blockquote>
+<ul>
+<li>a random forest (use method = rf: tuning parameter is mtry, use values of 1, 2, . . . , # of predictors (bagging is a special case here m=p!) There are 4 classification variables so m = 4. Center and scale the data.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set the bootstrap sample for test and train data</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#80% in training set</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(heart_tb), <span class="at">size =</span> <span class="fu">nrow</span>(heart_tb)<span class="sc">*</span><span class="fl">0.8</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">#20% in test set</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">setdiff</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(heart_tb), train)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>heartTrain2 <span class="ot">&lt;-</span> heart_tb[train, ]</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>heartTest2 <span class="ot">&lt;-</span> heart_tb[test, ]</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the bagged model fit</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>treeFit2 <span class="ot">&lt;-</span> <span class="fu">train</span>(HeartDisease <span class="sc">~</span>., <span class="at">data =</span> heartTrain2,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"rf"</span>,</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>                              <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>),</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">mtry =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Print the summary and best option</span></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>treeFit2<span class="sc">$</span>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  mtry  Accuracy     Kappa AccuracySD    KappaSD
+1    1 0.8251327 0.6451461 0.03698403 0.07488819
+2    2 0.8306121 0.6572118 0.03372878 0.06816141
+3    3 0.8278601 0.6514516 0.03204837 0.06478203
+4    4 0.8287610 0.6530937 0.03290348 0.06716838</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>treeFit2<span class="sc">$</span>bestTune</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  mtry
+2    2</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Based on the highest accuracy, the final value used for the model was mtry = 2.</em></p>
+</blockquote>
+<ul>
+<li>a boosted tree (use method = gbm: tuning parameters are n.trees, interaction.depth, shrinkage, and n.minobsinnode, use all combinations of n.trees of 25, 50, 100, and 200, interaction.depth of 1, 2, 3, shrinkage = 0.1, and nminobsinnode = 10; Hint: use expand.grid() to create your data frame for tuneGrid and verbose = FALSE limits the output produced. Center and scale the data.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>ntree <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">200</span>)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>intDep <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>shrink <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.1</span>)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>nmin <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>gbmGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">n.trees =</span> ntree, <span class="at">interaction.depth =</span> intDep, <span class="at">shrinkage =</span> shrink, <span class="at">n.minobsinnode =</span> nmin)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>treeFit3 <span class="ot">&lt;-</span> <span class="fu">train</span>(HeartDisease <span class="sc">~</span> ., <span class="at">data =</span> heartTrain2, <span class="at">method =</span> <span class="st">"gbm"</span>,</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">distribution =</span> <span class="st">"bernoulli"</span>, </span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">tuneGrid =</span> gbmGrid, </span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, </span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>                              <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>),</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Print the summary and best option</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>treeFit3<span class="sc">$</span>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   shrinkage interaction.depth n.minobsinnode n.trees  Accuracy     Kappa
+1        0.1                 1             10      25 0.7992622 0.5951914
+5        0.1                 2             10      25 0.8183913 0.6317375
+9        0.1                 3             10      25 0.8183051 0.6319800
+2        0.1                 1             10      50 0.8174285 0.6311021
+6        0.1                 2             10      50 0.8301220 0.6567525
+10       0.1                 3             10      50 0.8260246 0.6482344
+3        0.1                 1             10     100 0.8269870 0.6505639
+7        0.1                 2             10     100 0.8301712 0.6567801
+11       0.1                 3             10     100 0.8328804 0.6620078
+4        0.1                 1             10     200 0.8269809 0.6505910
+8        0.1                 2             10     200 0.8301834 0.6567984
+12       0.1                 3             10     200 0.8215261 0.6386962
+   AccuracySD    KappaSD
+1  0.04056833 0.08091256
+5  0.04524041 0.09124623
+9  0.04315631 0.08767623
+2  0.04278554 0.08498354
+6  0.04394229 0.08781457
+10 0.03898347 0.07780994
+3  0.04457995 0.08916791
+7  0.04552158 0.09130976
+11 0.04160932 0.08374196
+4  0.04291375 0.08634218
+8  0.04340608 0.08715589
+12 0.04538874 0.09101301</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>treeFit3<span class="sc">$</span>bestTune</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   n.trees interaction.depth shrinkage n.minobsinnode
+11     100                 3       0.1             10</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Based on the highest accuracy, the final values used for the model were n.trees = 100, interaction.depth = 3, shrinkage = 0.1 and n.minobsinnode = 10.</em></p>
+</blockquote>
+<p>Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>rpartPred <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> heartTest2<span class="sc">$</span>HeartDisease, <span class="at">reference =</span> <span class="fu">predict</span>(treeFit1, <span class="at">newdata =</span> heartTest2))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>rfPred <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> heartTest2<span class="sc">$</span>HeartDisease, <span class="at">reference =</span> <span class="fu">predict</span>(treeFit2, <span class="at">newdata =</span> heartTest2))</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>boostPred <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(<span class="at">data =</span> heartTest2<span class="sc">$</span>HeartDisease, <span class="at">reference =</span> <span class="fu">predict</span>(treeFit3, <span class="at">newdata =</span> heartTest2))</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Combine the statistics to view in a table</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>fitTreeStats <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(rpartPred<span class="sc">$</span>overall, rfPred<span class="sc">$</span>overall, boostPred<span class="sc">$</span>overall)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>fitTreeStats</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               rpartPred.overall rfPred.overall boostPred.overall
+Accuracy            0.7826086957   8.043478e-01      8.260870e-01
+Kappa               0.5405169185   6.007233e-01      6.428485e-01
+AccuracyLower       0.7159592304   7.395721e-01      7.634499e-01
+AccuracyUpper       0.8399193511   8.590451e-01      8.778980e-01
+AccuracyNull        0.6902173913   5.706522e-01      5.923913e-01
+AccuracyPValue      0.0034267352   1.815554e-11      8.488525e-12
+McnemarPValue       0.0008989128   1.000000e+00      5.958831e-01</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Based on the highest accuracy, the best model is the random forest model.</em></p>
+</blockquote>
+</section>
+<section id="wrap-up" class="level2">
+<h2 class="anchored" data-anchor-id="wrap-up">Wrap Up</h2>
+<p>Which model overall did the best job (in terms of accuracy) on the test set?</p>
+<ul>
+<li>Here is reminder of the accuracy values for the top model in each section.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Combine the statistic values for the top models</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>statCombine <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(knnPred<span class="sc">$</span>overall, glmPred<span class="sc">$</span>overall, rfPred<span class="sc">$</span>overall)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="co">#only display accuracy levels</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>statCombine[<span class="dv">1</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         knnPred.overall glmPred.overall rfPred.overall
+Accuracy       0.8145455       0.7890909      0.8043478</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><em>Based on the highest accuracy, the random forest model did the best job fitting and predicting the data</em></p>
+</blockquote>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
