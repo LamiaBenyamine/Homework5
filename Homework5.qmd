@@ -34,7 +34,7 @@ Total: 1190 observations - Duplicated: 272 observations = **Final data set:** 91
 
 Load libraries necessary for this analysis.
 
-```{r libraries, warning = FALSE, message=FALSE}
+```{r libraries, echo = FALSE, message = FALSE, warning = FALSE}
 library(readr)
 library(tidyr)
 library(dplyr)
@@ -114,7 +114,7 @@ heart_tb |>
 #Find correlated variables
 heart_tb |>
   select(where(is.numeric)) |>
-  ggcorr(label = TRUE)
+  ggcorr(label = TRUE, palette = "PuOr", name = "Correlation") 
 
 #Review categorical variables
 g1 <- heart_tb |> 
@@ -153,7 +153,7 @@ ggplot(data = g3, aes(x = RestingECG, y =count, fill = HeartDisease)) +
 
 View basic Linear regression models by Age and Max Heart Rate.
 
-```{r, message=FALSE}
+```{r, message = FALSE}
 distSum <- heart_tb |>
   group_by(Age) |>
   summarize(propDisease = mean((as.numeric(HeartDisease)-1)), n = n())
@@ -195,17 +195,30 @@ heartTest <- heart_tb[-heartIndex, ]
 
 ## kNN
 
-Fit a kNN model and use a 10 fold cross-validation. Train the kNN Model by repeating the 10 fold cross-validation 3 times.
+Fit a kNN model and use a 10 fold cross-validation. Train the kNN Model by repeating the 10 fold cross-validation 3 times and set k to be values from 1 to 40.
 
-```{r kNN}
-knnFit <- knn(train = select(heartTrain, Age, RestingBP, MaxHR),
-                              test = select(heartTest, Age, RestingBP, MaxHR),
-                              cl = heartTrain$HeartDisease,
+```{r kNN train}
+knnFit <- train(HeartDisease ~  ., 
+                              data = heartTrain,
                               method = "knn",
                               preProcess = c("center", "scale"),
-                              trControl = trainControl(method = "repeatedcv", number = 10, repeats = 3),
-                              k=3)
+                              trControl = trainControl(method = "repeatedcv", 
+                                                       number = 10, repeats = 3),
+                              tuneGrid = data.frame(k = 1:40)
+)
+plot(knnFit, main = "Accuracy based on number of k neighbors")
 ```
+
+> *Based on the highest accuracy, the final value used for the model was k = 3.*
+
+Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.
+
+```{r kNN predict}
+knnPred <- confusionMatrix(data = heartTest$HeartDisease, reference = predict(knnFit, newdata = heartTest))
+knnPred
+```
+
+> *The kNN fit still has a high accuracy after predicting using the test data set based on the confusion matrix.*
 
 ## Logistic Regression
 
@@ -214,6 +227,7 @@ Posit three different logistic regression models and fit those models on the tra
 From the EDA,
 
 ```{r}
+#Fit all predictor variables
 glmFit1 <- train(
   HeartDisease ~ .,
   data = heartTrain,
@@ -264,7 +278,8 @@ summary(glmFit1)
 Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.
 
 ```{r}
-confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit1, newdata = heartTest))
+glmPred <- confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit1, newdata = heartTest))
+glmPred
 ```
 
 -   Fit1 still has a high accuracy after predicting using the test data set based on the confusion matrix.
@@ -348,12 +363,12 @@ treeFit3$bestTune
 Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function.
 
 ```{r}
-stat1 <- round(confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit1, newdata = heartTest2))$overall,4)
-stat2 <- round(confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit2, newdata = heartTest2))$overall,4)
-stat3 <- round(confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit3, newdata = heartTest2))$overall,4)
+rpartPred <- confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit1, newdata = heartTest2))
+rfPred <- confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit2, newdata = heartTest2))
+boostPred <- confusionMatrix(data = heartTest2$HeartDisease, reference = predict(treeFit3, newdata = heartTest2))
 
 #Combine the statistics to view in a table
-fitTreeStats <- data.frame(rpart = stat1, rf = stat2, boosted = stat3)
+fitTreeStats <- data.frame(rpartPred$overall, rfPred$overall, boostPred$overall)
 fitTreeStats
 ```
 
@@ -363,4 +378,13 @@ fitTreeStats
 
 Which model overall did the best job (in terms of accuracy) on the test set?
 
-> *Based on the highest accuracy, the final values used for the model were n.trees = 100, interaction.depth = 3, shrinkage = 0.1 and n.minobsinnode = 10.*
+-   Here is reminder of the accuracy values for the top model in each section.
+
+```{r}
+#Combine the statistic values for the top models
+statCombine <- data.frame(knnPred$overall, glmPred$overall, rfPred$overall)
+#only display accuracy levels
+statCombine[1,]
+```
+
+> *Based on the highest accuracy, the random forest model did the best job fitting and predicting the data*
