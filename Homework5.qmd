@@ -146,7 +146,24 @@ ggplot(data = g3, aes(x = RestingECG, y =count, fill = HeartDisease)) +
   facet_wrap(~ ChestPainType) +
   ggtitle("Heart disease by resting ECG and type of chest pain") +
   theme_light()
+```
+View basic Linear regression models by Age and Max Heart Rate.
+```{r}
+distSum <- heart_tb |>
+  group_by(Age) |>
+  summarize(propDisease = mean((as.numeric(HeartDisease)-1)), n = n())
+ggplot(distSum, aes(x = Age, y = propDisease)) +
+  geom_point(stat = "identity", aes(size = n)) + 
+  geom_smooth(data = heart_tb, aes(x = Age, y = as.numeric(HeartDisease)-1), method = "lm") +
+  ggtitle("Linear Regression Model: Heart diesease by Age") + theme_light()
 
+distSum <- heart_tb |>
+  group_by(MaxHR) |>
+  summarize(propDisease = mean((as.numeric(HeartDisease)-1)), n = n())
+ggplot(distSum, aes(x = MaxHR, y = propDisease)) +
+  geom_point(stat = "identity", aes(size = n)) + 
+  stat_smooth(data = heart_tb, aes(x = MaxHR, y = as.numeric(HeartDisease)-1), method = "glm", method.args = list(family = "binomial")) +
+  ggtitle("Linear Regression Model: Heart diesease by Max Heart Rate") + theme_light()
 ```
 
 3.  We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors. In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina, ChestPainType, and RestingECG.
@@ -161,6 +178,7 @@ heart_tb2 <- head(predict(dummies, newdata = heart_tb))
 Split your data into a training and test set with 70:30 ratio.
 
 ```{r split test/train}
+#Set seed to get the same training and test set each time
 set.seed(10)
 heartIndex <- createDataPartition(heart_tb$HeartDisease, p = 0.7, list = FALSE)
 head(heartIndex)
@@ -197,24 +215,18 @@ Center and scale data
 ## Logistic Regression
 
 Posit three different logistic regression models and fit those models on the training set, using repeated CV as done above.
-```{r}
-glmFit1 <- glm(HeartDisease ~ RestingBP, data = heartTrain, family = "binomial")
-predict(glmFit1, newdata = heartTest, type = "response", se.fit=TRUE)
 
+From the EDA, 
+```{r}
 glmFit1 <- train(
   HeartDisease ~ .,
   data = heartTrain,
   method =  "glm",
   family = "binomial",
   preProcess = c("center", "scale"),
-  trControl = trainControl(method = "cv", number = 10)
+  trControl = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3)
 )
-summary(glmFit1)
-confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit1, newdata = heartTest))
-
-pred <- predict(glmFit1, newdata = heartTest)
-postResample(pred, obs = heartTest$HeartDisease)
-confusionMatrix(data = heartTest$HeartDisease, reference = pred)
 
 #Fit Cholesterol & Age with Resting BP, Age, & Sex
 glmFit2 <- train(
@@ -223,29 +235,40 @@ glmFit2 <- train(
   method =  "glm",
   family = "binomial",
   preProcess = c("center", "scale"),
-  trControl = trainControl(method = "cv", number = 10)
+  trControl = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3)
 )
-summary(glmFit2)
-confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit2, newdata = heartTest))
 
-
-#Fit Resting BP, Age, & Sex wit Chest Pain Type, Age, & Sex
+#Fit Resting BP, Age, & Sex with Chest Pain Type, Age, & Sex with Max HR and Sex
 glmFit3 <- train(
-  HeartDisease ~  RestingBP*Age*Sex + ChestPainType*Age*Sex,
+  HeartDisease ~  RestingBP*Age*Sex + ChestPainType*Age*Sex + MaxHR*Sex,
   data = heartTrain,
   method =  "glm",
   family = "binomial",
   preProcess = c("center", "scale"),
-  trControl = trainControl(method = "cv", number = 10)
+  trControl = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3)
 )
-r <- summary(glmFit3)
-r2 <- confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit3, newdata = heartTest))
-r2 <- conf
+#Summary table to determine the best model
+fitStats <- data.frame(Fit = c("Fit1", "Fit2", "Fit3"),
+                      Accuracy = c(glmFit1$results$Accuracy, glmFit3$results$Accuracy, glmFit3$results$Accuracy),
+                      AIC = c(summary(glmFit1)$aic, summary(glmFit2)$aic, summary(glmFit3)$aic))
+fitStats
 ```
 
 Identify your best model and provide a basic summary of it.
 
+-   The best model is Fit1 because it has the lowest AIC value and highest accuracy.
+```{r}
+#Summary of best model
+summary(glmFit1)
+```
+
 Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.
+```{r}
+confusionMatrix(data = heartTest$HeartDisease, reference = predict(glmFit1, newdata = heartTest))
+```
+-   Fit1 still has a high accuracy after predicting using the test data set based on the confusion matrix.
 
 ## Tree Models
 
